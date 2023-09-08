@@ -14,7 +14,9 @@ var (
 )
 
 func main() {
-	opts := providerserver.ServeOpts{}
+	opts := providerserver.ServeOpts{
+		Address: "registry.terraform.io/thiagoarrais/sha256sum",
+	}
 
 	err := providerserver.Serve(context.Background(), sha256sum.New(version), opts)
 

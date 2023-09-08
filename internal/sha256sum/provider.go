@@ -45,7 +45,7 @@ func (p *SHA256SumProvider) DataSources(ctx context.Context) []func() datasource
 // Resources satisfies the provider.Provider interface for ExampleCloudProvider.
 func (p *SHA256SumProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		// Provider specific implementation
+		func() resource.Resource { return &FileResource{} },
 	}
 }
 
