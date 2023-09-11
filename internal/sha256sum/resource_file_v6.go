@@ -2,7 +2,9 @@ package sha256sum
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"os"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -19,9 +21,9 @@ type FileResource struct {
 }
 
 type FileModel struct {
-	ID       types.String `tfsdk:"id"`
-	Path     types.String `tfsdk:"path"`
-	Contents types.String `tfsdk:"contents"`
+	ID       types.String      `tfsdk:"id"`
+	Path     types.String      `tfsdk:"path"`
+	Contents Base64StringValue `tfsdk:"contents"`
 }
 
 func (*FileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -44,7 +46,8 @@ func (*FileResource) Schema(ctx context.Context, req resource.SchemaRequest, res
 				},
 			},
 			"contents": schema.StringAttribute{
-				Required: true,
+				Required:   true,
+				CustomType: Base64String,
 			},
 		},
 	}
@@ -83,8 +86,7 @@ func (*FileResource) Read(ctx context.Context, req resource.ReadRequest, resp *r
 		resp.Diagnostics.AddError("Unable to read file", err.Error())
 		return
 	}
-	contents := base64.StdEncoding.EncodeToString(binaryContents)
-	data.Contents = types.StringValue(contents)
+	data.Contents = Base64String.Value(fmt.Sprintf("%x", sha256.Sum256(binaryContents)))
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
@@ -105,6 +107,7 @@ func (*FileResource) Update(ctx context.Context, req resource.UpdateRequest, res
 		return
 	}
 
+	data.Contents = Base64String.Value(fmt.Sprintf("%x", sha256.Sum256(contents)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
