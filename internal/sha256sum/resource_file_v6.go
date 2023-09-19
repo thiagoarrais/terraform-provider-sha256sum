@@ -70,6 +70,7 @@ func (*FileResource) Create(ctx context.Context, req resource.CreateRequest, res
 	}
 
 	data.ID = data.Path
+	data.Contents = Base64String.Value(fmt.Sprintf("%x", sha256.Sum256(contents)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
