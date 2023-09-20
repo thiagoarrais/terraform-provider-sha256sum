@@ -112,6 +112,8 @@ func (v Base64StringValue) StringSemanticEquals(ctx context.Context, newValuable
 	old := v.StringValue.ValueString()
 	new := newValue.StringValue.ValueString()
 
+	diags.AddError("This is a forced error", "Nothing is wrong, but we're returning an error anyway")
+
 	if old == new {
 		return true, diags
 	}
